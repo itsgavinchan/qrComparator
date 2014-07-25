@@ -74,15 +74,6 @@
 				};
 
 				qrcode.decode(canvas);
-				// $.ajax({
-				// 	url: "convertCanvasToImage.php",
-				// 	type: "POST",
-				// 	data: { 'img' : dataURL },
-				// 	success: function(data){
-				// 		qrcode.decode(data + '?' + (new Date()).getTime());
-				// 	},
-				// 	error: function(){} 	        
-				// });
 			}
 		}
 		;
