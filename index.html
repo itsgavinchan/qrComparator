@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Mobile Security QR Code Project</title>
+
+	<!-- Bootstrap CSS Files -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+    <!--
+    <?php 
+        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
+    ?>
+    -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <!--             
+            <div class="form-group">
+                <label for="attackMode">METHOD OF ATTACK</label>
+                <select id="attackMode" class="form-control">
+                    <option value="Module" selected="selected">Brute-Force Module</option>
+                </select>
+            </div>
+            -->
+
+            <!-- <div class="form-group"> -->
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                                    QR INDIVIDUAL PARTS
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                CONTENT INSIDE
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!-- </div> -->
+            
+            <div class="form-group">
+                <div id="toggleTop" class="btn btn-default btn-block active">Show Original</div>
+            </div>
+
+            <div class="form-group">
+                <label for="text">CONTENT <span id="textChar"></span></label>
+                <textarea id="text" class="form-control" rows="3" placeholder="Enter Content Here">Enter Content Here</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="text">DECODED CONTENT:</label>
+                <textarea id="decoded" class="form-control" rows="3" placeholder="Decoded Content Appears Here"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="eclevel">ERROR CORRECTION LEVEL</label>
+                <select id="eclevel" class="form-control">
+                    <option value="L">L - Low (7%)</option>
+                    <option value="M">M - Medium (15%)</option>
+                    <option value="Q">Q - Quartile (25%)</option>
+                    <option value="H" selected="selected">H - High (30%)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="minversion">VERSION: (MIN <span id="minVer">1</span>, MAX <span id="finalVer"></span>)</label>
+                <input id="minversion" type="range" value="1" min="1" max="10" step="1" />
+            </div>
+            <button id="updateQR" class="btn btn-primary btn-block">GENERATE</button>
+            <button id="decodeQR" class="btn btn-primary btn-block">DECODE</button>
+
+        </div>
+
+
+
+        <div class="col-sm-offset-3 col-md-offset-2 main" >
+            <div class="col-sm-6">
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapseOriginal" data-parent="#accordion" >
+                                    ORIGINAL QR CODE
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseOriginal" class="panel-collapse collapse in topQR">
+                            <div id="original" class="panel-body QRCode">
+                                ORIGINAL QR CODE SHOWN HERE
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapseDiff" data-parent="#accordion">
+                                    MODIFICATIONS
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseDiff" class="panel-collapse collapse in topQR">
+                            <div id="differences" class="panel-body QRCode">
+                                MODIFICATIONS ON ORIGINAL QR CODE SHOWN HERE
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
+                                    MODIFIABLE QR CODE
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseFour" class="panel-collapse collapse in">
+                            <div id="modifiable" class="panel-body QRCode">
+                                MODIFIABLE QR CODE SHOWN HERE
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+      </div>
+    </div>
+
+	<!-- End of HTML File: Javascript Loading -->
+	<script src="js/jquery-1.10.2.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/ff-range.js"></script>
+    <script src="js/jquery.qrcode-0.8.0.js"></script>
+
+    <!-- LazarSoft Decoder Files -->
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/grid.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/version.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/detector.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/formatinf.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/errorlevel.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/bitmat.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/datablock.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/bmparser.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/datamask.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/rsdecoder.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/gf256poly.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/gf256.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/decoder.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/qrcode.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/findpat.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/alignpat.js"></script>
+    <script type="text/javascript" src="js/LazarSoft-jsqrcode/databr.js"></script>
+
+    <script src="js/uiScript.js"></script>
+    <script src="js/modifiableScript.js"></script>
+
+</body>
+</html>
