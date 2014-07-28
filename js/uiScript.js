@@ -1,5 +1,13 @@
 (function ($) {
 
+	window.onerror = function errorHandler(msg, url, line) {
+
+		alert( 'Decoding the QR code failed. Error: ' + msg);
+
+		// Just let default handler run.
+		return false;
+	};
+	
 	var updateQRCode = function(container) {
 			var options = {
 				ecLevel: $("#eclevel").val(),
@@ -53,6 +61,7 @@
 			updateQRCode( "#modifiable" );
 
 			resizeAllQRs();
+
 		},
 
 		toggleTop = function(){
@@ -62,27 +71,68 @@
 				( $( "#toggleTop" ).hasClass("active") ) ? $(this).collapse('show') : $(this).collapse('hide');
 			});
 		},
+
 		decodeQR = function(){
-			if( $("#text").val().replace(/ /g,'') == '' ){ alert("Cannot decode empty string (even if with whitespace)."); }
+			if( $("#text").val().replace(/ /g,'') == '' ){ 
+				alert("Cannot decode empty string (even if with whitespace)."); 
+			}
 			else{
 				var canvas = document.getElementById('modifiable').children[0];
 				var dataURL = canvas.toDataURL();
 				canvas.src = dataURL;
 
-				qrcode.callback = function(data) { 
-					$("#decoded").val( data );
+				qrcode.callback = function( data ) { 
+					$('#decoded').val( data );
+					alert( 'Success! View "Decoded Content" for results!' );
 				};
 
 				qrcode.decode(canvas);
 			}
-		}
-		;
+		},
+
+		reset = function(){
+
+			// Recall: Version 1 has 21 modules. Each higher version number comprises 4 additional modules per side
+			moduleCount = 21 + (parseInt($("#finalVer").text()) - 1) * 4;
+
+			// Create the controller, which needs to be done at each new QR code generated
+			var controller = new CanvasController( 'original', 'modifiable', 'differences' );
+
+			// Clear the comparator canvas because it's to show differences between two QR codes
+			controller.comparator.clearCanvas();
+			controller.comparator.showCanvasGrid('#000000');
+
+			// Have a listener for the modifiable canvas in the case of the bruteforce, manual technique
+			controller.modifiable.canvas.addEventListener('mousedown', function(evt) {
+
+				var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
+				console.log( controller.modifiable.getHexColorByIndex(index) );
+				
+				if( controller.modifiable.getHexColorByIndex(index) == white ){
+					controller.modifiable.changeColorByIndex( index, black );
+				}
+				else{
+					controller.modifiable.changeColorByIndex( index, white );
+				}
+				
+				controller.compare( index );
+
+			}, false);
+
+			$("#showGrid").on("input change", function(){
+				controller.comparator.hasGrid = $('#showGrid').prop('checked');
+				controller.comparator.clearCanvas();
+			});
+		};
 
 	$(function () {
+
 		updateAllQRs();
 
+		reset();
+		$("#updateQR").on("click", function(){ updateAllQRs(); reset(); } );
+		
 		$("#toggleTop").on("click", toggleTop );
-		$("#updateQR").on("click", updateAllQRs );
 		$("#decodeQR").on("click", decodeQR );
 
 		$("#text").on("input change", function(){
@@ -92,12 +142,11 @@
 		$("#minversion").on("input change", function(){
 			$("#minVer").text( $("#minversion").val() );
 		});
-		
+
 	});
 
-
+	
 	$(window).resize(function() {
 		resizeAllQRs();
 	});
-
 }(jQuery));

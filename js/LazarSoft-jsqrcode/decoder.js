@@ -42,7 +42,7 @@ Decoder.correctErrors=function( codewordBytes,  numDataCodewords)
 		//var corrector = new ReedSolomon(codewordsInts, numECCodewords);
 		//corrector.correct();
 	}
-	catch ( rse)
+	catch (rse)
 	{
 		throw rse;
 	}

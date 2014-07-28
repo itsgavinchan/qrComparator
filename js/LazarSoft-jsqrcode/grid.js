@@ -129,7 +129,7 @@ GridSampler.sampleGrid3=function( image,  dimension,  transform)
 							bits.set_Renamed(x >> 1, y);
 					}
 				}
-				catch ( aioobe)
+				catch (aioobe)
 				{
 					// This feels wrong, but, sometimes if the finder patterns are misidentified, the resulting
 					// transform gets "twisted" such that it maps a straight line of points to a set of points

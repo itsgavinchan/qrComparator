@@ -11,51 +11,33 @@
 </head>
 
 <body>
-    <!--
-    <?php 
-        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-        header("Cache-Control: post-check=0, pre-check=0", false);
-        header("Pragma: no-cache");
-    ?>
-    -->
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-            <!--             
+                        
             <div class="form-group">
                 <label for="attackMode">METHOD OF ATTACK</label>
                 <select id="attackMode" class="form-control">
-                    <option value="Module" selected="selected">Brute-Force Module</option>
+                    <option value="module" selected="selected">Brute-Force Module Attack</option>
                 </select>
             </div>
-            -->
+           
 
             <!-- <div class="form-group"> -->
-                <div class="panel-group" id="accordion">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                    QR INDIVIDUAL PARTS
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseOne" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                CONTENT INSIDE
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- <div id="toggleTop" class="btn btn-default btn-block active">Show Original</div> -->
             <!-- </div> -->
             
             <div class="form-group">
-                <div id="toggleTop" class="btn btn-default btn-block active">Show Original</div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id='showGrid' checked> SHOW GRID
+                    </label>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="text">CONTENT <span id="textChar"></span></label>
-                <textarea id="text" class="form-control" rows="3" placeholder="Enter Content Here">A</textarea>
+                <textarea id="text" class="form-control" rows="3" placeholder="Enter Content Here">Enter Content Here</textarea>
             </div>
 
             <div class="form-group">
@@ -90,12 +72,13 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" href="#collapseOriginal" data-parent="#accordion" >
+                                <!-- <a data-toggle="collapse" href="#collapseOriginal" data-parent="#accordion" > -->
+                                <a data-toggle="collapse" data-parent="#accordion" >
                                     ORIGINAL QR CODE
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseOriginal" class="panel-collapse collapse topQR">
+                        <div id="collapseOriginal" class="panel-collapse collapse in topQR">
                             <div id="original" class="panel-body QRCode">
                                 ORIGINAL QR CODE SHOWN HERE
                             </div>
@@ -108,12 +91,13 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" href="#collapseDiff" data-parent="#accordion">
+                                <!-- <a data-toggle="collapse" href="#collapseDiff" data-parent="#accordion"> -->
+                                <a data-toggle="collapse" data-parent="#accordion">
                                     MODIFICATIONS
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseDiff" class="panel-collapse collapse topQR">
+                        <div id="collapseDiff" class="panel-collapse collapse in topQR">
                             <div id="differences" class="panel-body QRCode">
                                 MODIFICATIONS ON ORIGINAL QR CODE SHOWN HERE
                             </div>
