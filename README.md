@@ -23,6 +23,6 @@ This project uses a modified [larsung.de's jQuery.qrcode-0.8.0.js](http://larsju
   * Added /js/uiScript.js to handle index.html's field input changes and mobile responsiveness.
 
 ### To Be Implemented (Order of Importance)
-* Implement the simulation of different versions of attacks, starting with attack on code words.
+* Implement different simulated attacks on QR codes, beginning with attack on code words now that manual blind-attacks are implemented.
 * Make top two QR codes mobile responsive upon browser window change.
 * Make sidebar togglable and visible in mobile browser view.
