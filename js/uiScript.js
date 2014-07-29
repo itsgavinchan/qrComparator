@@ -2,8 +2,8 @@
 
 	window.onerror = function errorHandler(msg, url, line) {
 
-		alert( 'Decoding the QR code failed. Error: ' + msg);
-
+		$('#decoded').val( 'ERR: Decoding the QR code failed. ' + msg);
+		window.clearTimeout();
 		// Just let default handler run.
 		return false;
 	};
@@ -75,6 +75,7 @@
 		decodeQR = function(){
 			if( $("#text").val().replace(/ /g,'') == '' ){ 
 				alert("Cannot decode empty string (even if with whitespace)."); 
+
 			}
 			else{
 				var canvas = document.getElementById('modifiable').children[0];
@@ -83,20 +84,37 @@
 
 				qrcode.callback = function( data ) { 
 					$('#decoded').val( data );
-					alert( 'Success! View "Decoded Content" for results!' );
+					// alert( 'Success! View "Decoded Content" for results!' );
 				};
 
 				qrcode.decode(canvas);
 			}
-		},
 
-		reset = function(){
+			return $('#decoded').val( );
+		};
+
+		
+	$(function () {
+
+		updateAllQRs();
+		window.clearTimeout();
+		
+		// Create the controller, which needs to be done only once when the page loads
+		var controller = new CanvasController( 'original', 'modifiable', 'differences' );
+		
+		var reset = function(){
+
+			updateAllQRs();
+			window.clearTimeout();
+
+			$('#decoded').val( '' );
 
 			// Recall: Version 1 has 21 modules. Each higher version number comprises 4 additional modules per side
 			moduleCount = 21 + (parseInt($("#finalVer").text()) - 1) * 4;
 
-			// Create the controller, which needs to be done at each new QR code generated
-			var controller = new CanvasController( 'original', 'modifiable', 'differences' );
+			// To avoid lag and the over-creation of objects, the controller is reset instead to simply replace the 
+			// the objects that need to be reset. 
+			controller.resetController( 'original', 'modifiable', 'differences' );
 
 			// Clear the comparator canvas because it's to show differences between two QR codes
 			controller.comparator.clearCanvas();
@@ -106,31 +124,56 @@
 			controller.modifiable.canvas.addEventListener('mousedown', function(evt) {
 
 				var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
-				console.log( controller.modifiable.getHexColorByIndex(index) );
 				
-				if( controller.modifiable.getHexColorByIndex(index) == white ){
-					controller.modifiable.changeColorByIndex( index, black );
-				}
-				else{
-					controller.modifiable.changeColorByIndex( index, white );
-				}
-				
-				controller.compare( index );
+				controller.invert( index );
 
 			}, false);
 
-			$("#showGrid").on("input change", function(){
-				controller.comparator.hasGrid = $('#showGrid').prop('checked');
-				controller.comparator.clearCanvas();
-			});
+			$('#decoded').val( '' );
+
+			// $("#showGrid").on("input change", function(){
+			// 	controller.comparator.hasGrid = $('#showGrid').prop('checked');
+			// 	controller.comparator.clearCanvas();
+			// });
 		};
 
-	$(function () {
-
-		updateAllQRs();
-
 		reset();
-		$("#updateQR").on("click", function(){ updateAllQRs(); reset(); } );
+
+		$("#simulate").on("click", function(){
+
+			var action = $('#attackMode').val();
+
+			var automaticAtk = function( ){
+				var index = { 
+					x: Math.floor( ( Math.random() * moduleCount ) ), 
+					y: Math.floor( ( Math.random() * moduleCount ) )
+				};
+
+				console.log( index.x + ', ' + index.y ); 
+
+				controller.invert( index );
+				decodeQR();
+
+				// See the global error catcher at the top of this file
+				setTimeout(automaticAtk, 10);
+
+			};
+
+			switch( action ) {
+				case 'manual':
+					break;
+				case 'automatic':
+
+					automaticAtk();
+
+					break;
+				default:
+					throw 'Not a Simulation Option';
+					break;
+			}
+		});
+
+		$("#updateQR").on("click", reset );
 		
 		$("#toggleTop").on("click", toggleTop );
 		$("#decodeQR").on("click", decodeQR );

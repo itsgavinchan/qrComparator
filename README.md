@@ -5,7 +5,11 @@ qrComparator
 This project uses a modified [larsung.de's jQuery.qrcode-0.8.0.js](http://larsjung.de/qrcode/) as the QR Code generator in conjunction with [LazarSoft's jsqrcode](https://github.com/LazarSoft/jsqrcode) to decode QR codes. The purpose of this project is to display visual differences between the original QR code and a modified QR code, and will attempt to visually depict a variety of attacks on QR codes. For layout purposes, this page is formatted with [Twitter BootStrap](getbootstrap.com/) and aimed to be mobile-responsive.
 
 ### Changelog (Ordered Newest to Oldest)
-* **2014.07.28**
+* **2014.07.29**
+  * Modified /js/modifiableScript.js with reset methods to simply reset the existing, necessary objects instead of consuming space and creating new objects.
+  * Modified index.html to remove the checkbox '#showGrid.'
+  * Modified /js/uiScript.js to simulate an automatic attack (while successfully showing changes made in those attacks thanks to setTimeout and window.clearTimeout ) without a specific target. Implementation showed intense lag after the first attack simulation.
+* **2014.07.28*
   * Modified /js/modifiableScript.js to come before /js/uiScript.js, with /js/modifiableScript.js being the library and /js/modifiableScript.js being the handler.
   * Modified index.html to include the checkbox '#showGrid' to easier differenciate changes.
   * Modified /js/uiScript.js to have a global listener to thrown errors from LazarSoft and alert the user whether the decoding procedure was successful or if an error is thrown.

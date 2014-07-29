@@ -21,10 +21,19 @@
 		this.containerModuleLength = this.canvasContainer.width() / moduleCount;
 		this.ratio = this.canvasModuleLength / this.containerModuleLength;
 		this.enableModification = enableModification;
-		this.hasGrid = $('#showGrid').prop('checked');
+		this.hasGrid = true;
 		this.defaultGridColor = black;
 
 		// Class Methods
+
+		this.resetCanvas = function(container){
+			this.canvas = document.getElementById(container).children[0];
+			this.canvasContainer = $('#' + container + ' > canvas' );
+			this.context = this.canvas.getContext('2d');
+			this.canvasModuleLength = this.canvas.width / moduleCount;
+			this.containerModuleLength = this.canvasContainer.width() / moduleCount;
+			this.ratio = this.canvasModuleLength / this.containerModuleLength;
+		};
 
 		// Get the position of the mouse relative to the canvas
 		this.getMousePos = function (evt) {
@@ -136,6 +145,14 @@
 
 		// Class Methods
 
+		// Resets the CanvasObjects
+		this.resetController = function( original, modifiable, comparator ){
+			console.log( 'ya');
+			this.original.resetCanvas( original );
+			this.modifiable.resetCanvas( modifiable );
+			this.comparator.resetCanvas( comparator );
+		};
+
 		// Compares the color of the modified QR code and the original QR code based on index count
 		// This implies that the original and the modifiable must have the same module count
 		this.compare = function(index){
@@ -145,16 +162,32 @@
 			// If no change is detected, as in if both colors are still the same, then that canvas index is cleared.
 			if( originalColor == modifiableColor ){
 				this.comparator.clearIndex( index );
+				return originalColor;
 			}
 			// A change on the original QR code from white to black indicates a red color
 			else if( originalColor == white && modifiableColor == black ){
 				this.comparator.changeColorByIndex( index, '#FF0000' );
+				return '#FF0000'
 			}
 			// A change on the original QR code from black to white indicates a yellow color
 			else if( originalColor == black && modifiableColor == white ){
 				this.comparator.changeColorByIndex( index, '#FFFF00' );
+				return '#FFFF00';
 			}
 
+		};
+
+		this.invert = function(index){
+			if( this.modifiable.getHexColorByIndex(index) == white ){
+				this.modifiable.changeColorByIndex( index, black );
+			}
+			else{
+				this.modifiable.changeColorByIndex( index, white );
+			}
+
+			this.compare( index );
+
+			return true;
 		};
 
 	}
