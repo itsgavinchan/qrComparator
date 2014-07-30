@@ -183,13 +183,14 @@
 			switch( action ) {
 				case 'manual':
 					// Have a listener for the modifiable canvas in the case of the bruteforce, manual technique
-						controller.modifiable.canvas.addEventListener('mousedown', function(evt) {
-							if( action == 'manual' ){
+
+						controller.modifiable.canvas.onmousedown = function(evt) {
+				            if( action == 'manual' ){
 								var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
 								recordIndex( index.x, index.y );
 								controller.invert( index );
 							}
-						}, false);
+				        };
 
 					break;
 				case 'deface':
@@ -198,9 +199,10 @@
 				            if (!controller.modifiable.canvas.isDrawing) {
 				               return;
 				            }
-
-				            mouse = controller.modifiable.getMousePos( evt );
-				            controller.modifiable.drawMouse( mouse, $('#color').val(), $('#brushSize').val() );
+				            if( action == 'deface' ){
+					            mouse = controller.modifiable.getMousePos( evt );
+					            controller.modifiable.drawMouse( mouse, $('#color').val(), $('#brushSize').val() );
+				            }
 				        };
 
 				        controller.modifiable.canvas.onmousedown = function(evt) {
@@ -228,23 +230,6 @@
 			}
 		});
 
-		$("#updateQR").on("click", reset );
-		
-		$("#toggleTop").on("click", toggleTop );
-		$("#decodeQR").on("click", decodeQR );
-
-		$("#text").on("input change", function(){
-			console.log($("#textChar").text());
-		});
-
-		$("#minversion").on("input change", function(){
-			$("#minVer").text( $("#minversion").val() );
-		});
-
-		$("#brushSize").on("input change", function(){
-			$("#brush").text( $("#brushSize").val() );
-		});
-
 		$("#attackMode").on("input change", function(){
 			switch( $("#attackMode").val() ){
 				case 'manual':
@@ -264,6 +249,24 @@
 					break;
 			}
 		});
+
+		$("#updateQR").on("click", reset );
+		
+		$("#toggleTop").on("click", toggleTop );
+		$("#decodeQR").on("click", decodeQR );
+
+		$("#text").on("input change", function(){
+			console.log($("#textChar").text());
+		});
+
+		$("#minversion").on("input change", function(){
+			$("#minVer").text( $("#minversion").val() );
+		});
+
+		$("#brushSize").on("input change", function(){
+			$("#brush").text( $("#brushSize").val() );
+		});
+		$("#simulate").trigger('click');
 
 		$(window).resize(function() {
 			resizeAllQRs();

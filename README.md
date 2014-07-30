@@ -6,6 +6,7 @@ This project uses a modified [larsung.de's jQuery.qrcode-0.8.0.js](http://larsju
 
 ### Changelog (Ordered Newest to Oldest)
 * **2014.07.30**
+  * Modified /js/uiScript.js to draw on the canvas while the mouse is over.
   * Modified /js/uiScript.js to record and append to '#attackLog' the indicies affected.
   * Modified index.html's sidebar formatting.
   * Added to index.html a collapsable 'Indicies Log' that records the indicies on the pixel module of those attacked and inverted.
