@@ -6,6 +6,10 @@ This project uses a modified [larsung.de's jQuery.qrcode-0.8.0.js](http://larsju
 
 ### Changelog (Ordered Newest to Oldest)
 * **2014.07.30**
+  * Modified /js/uiScript.js to record and append to '#attackLog' the indicies affected.
+  * Modified index.html's sidebar formatting.
+  * Added to index.html a collapsable 'Indicies Log' that records the indicies on the pixel module of those attacked and inverted.
+  * Modified /js/modifiableScript.js CanvasController's targetColor method.
   * Modified /js/modifiableScript.js with resize methods that changes the brush upon window resize.
   * Modified /js/uiScript.js to simulate the manual defacement attack on the '#modifiable' canvas. Change needs to eventually reflect on the '#differences' canvas.
   * Added to index.html's #attackMode selection the option 'Manual Defacement Attack' to deface a QR code by mouse without any specific target to pixel modules. The color selection option is applicable in this attack and the brush size input slider has been added as well to dynamically change the size of the brush. 

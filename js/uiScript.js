@@ -109,6 +109,7 @@
 			window.clearTimeout();
 
 			$('#decoded').val( '' );
+			$('#attackLog').empty();
 
 			// Recall: Version 1 has 21 modules. Each higher version number comprises 4 additional modules per side
 			moduleCount = 21 + (parseInt($("#finalVer").text()) - 1) * 4;
@@ -126,56 +127,58 @@
 
 			$('#decoded').val( '' );
 
-			// $("#showGrid").on("input change", function(){
-			// 	controller.comparator.hasGrid = $('#showGrid').prop('checked');
-			// 	controller.comparator.clearCanvas();
-			// });
 		};
 
 		reset();
 
 		var action = $('#attackMode').val();
 
+		var invertAttack = function( ){
+			var index = { 
+				x: Math.floor( ( Math.random() * moduleCount ) ), 
+				y: Math.floor( ( Math.random() * moduleCount ) )
+			};
+
+			controller.invert( index );
+
+			recordIndex( index.x, index.y );
+
+			decodeQR();
+
+			// See the global error catcher at the top of this file
+			setTimeout(invertAttack, parseInt( $('#timing').val() ) );
+
+		};
+
+		var colorAttack = function( color ){
+			var index = { 
+				x: Math.floor( ( Math.random() * moduleCount ) ), 
+				y: Math.floor( ( Math.random() * moduleCount ) )
+			};
+
+			while ( !controller.targetColor( index, color ) ){
+				index = { 
+					x: Math.floor( ( Math.random() * moduleCount ) ), 
+					y: Math.floor( ( Math.random() * moduleCount ) )
+				};
+			}
+
+			recordIndex( index.x, index.y );
+
+			decodeQR();
+
+			// See the global error catcher at the top of this file
+			setTimeout(colorAttack, parseInt( $('#timing').val() ), color);
+
+		};
+
+		var recordIndex = function( x, y ){
+			$('#attackLog').text( $('#attackLog').text() + "[" + x + ", " + y + "] " );
+		};
+
 		$("#simulate").on("click", function(){
 
 			action = $('#attackMode').val();
-
-			var invertAttack = function( ){
-				var index = { 
-					x: Math.floor( ( Math.random() * moduleCount ) ), 
-					y: Math.floor( ( Math.random() * moduleCount ) )
-				};
-
-				console.log( index.x + ', ' + index.y ); 
-
-				controller.invert( index );
-				decodeQR();
-
-				// See the global error catcher at the top of this file
-				setTimeout(invertAttack, 10);
-
-			};
-
-			var colorAttack = function( color ){
-				var index = { 
-					x: Math.floor( ( Math.random() * moduleCount ) ), 
-					y: Math.floor( ( Math.random() * moduleCount ) )
-				};
-
-				// console.log( index.x + ', ' + index.y ); 
-
-				while ( !controller.targetColor( index, color ) ){
-					index = { 
-						x: Math.floor( ( Math.random() * moduleCount ) ), 
-						y: Math.floor( ( Math.random() * moduleCount ) )
-					};
-				}
-				decodeQR();
-
-				// See the global error catcher at the top of this file
-				setTimeout(colorAttack, 10, color);
-
-			};
 
 			switch( action ) {
 				case 'manual':
@@ -183,7 +186,7 @@
 						controller.modifiable.canvas.addEventListener('mousedown', function(evt) {
 							if( action == 'manual' ){
 								var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
-								
+								recordIndex( index.x, index.y );
 								controller.invert( index );
 							}
 						}, false);

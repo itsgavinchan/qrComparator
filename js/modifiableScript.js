@@ -220,7 +220,7 @@
 		};
 
 		this.targetColor = function( index, color ){
-			if( this.modifiable.getHexColorByIndex(index) == color ){
+			if( this.modifiable.getHexColorByIndex(index) != color ){
 				this.invert( index );
 				return true;
 			}
