@@ -194,12 +194,22 @@
 					break;
 				case 'deface':
 
-						controller.modifiable.canvas.addEventListener('mousedown', function(evt) {
-							if( action == 'deface' ){
-								var mouse = controller.modifiable.getMousePos( evt );
-								controller.modifiable.drawMouse(mouse, $('#color').val(), $('#brushSize').val() );
-							}
-						}, false);
+						controller.modifiable.canvas.onmousemove = function(evt) {
+				            if (!controller.modifiable.canvas.isDrawing) {
+				               return;
+				            }
+
+				            mouse = controller.modifiable.getMousePos( evt );
+				            controller.modifiable.drawMouse( mouse, $('#color').val(), $('#brushSize').val() );
+				        };
+
+				        controller.modifiable.canvas.onmousedown = function(evt) {
+				            controller.modifiable.canvas.isDrawing = true;
+				        };
+
+				        controller.modifiable.canvas.onmouseup = function(evt) {
+				            controller.modifiable.canvas.isDrawing = false;
+				        };
 
 					break;
 				case 'invert':
@@ -233,6 +243,26 @@
 
 		$("#brushSize").on("input change", function(){
 			$("#brush").text( $("#brushSize").val() );
+		});
+
+		$("#attackMode").on("input change", function(){
+			switch( $("#attackMode").val() ){
+				case 'manual':
+					$('#log').show();
+					break;
+				case 'deface':
+					$('#log').hide();
+					break;
+				case 'invert':
+					$('#log').show();
+					break;
+				case 'color':
+					$('#log').show();
+					break;
+				default:
+					throw 'Not a Simulation Option';
+					break;
+			}
 		});
 
 		$(window).resize(function() {

@@ -148,10 +148,13 @@
 
 		this.drawMouse = function( mouse, color, brushDiameter ){
 			if( this.enableModification ) {
-				var offsetSize = brushDiameter * this.ratio;
 
+				this.context.beginPath();
+				this.context.moveTo(mouse.x * this.ratio, mouse.y * this.ratio);
+				this.context.arc( mouse.x * this.ratio, mouse.y * this.ratio, brushDiameter * this.ratio / 2, 0, 2 * Math.PI);
 				this.context.fillStyle = color;
-				this.context.fillRect( mouse.x * this.ratio - offsetSize * 0.5, mouse.y * this.ratio - offsetSize * 0.5, offsetSize, offsetSize );
+				this.context.fill();
+				
 			}
 			else {
 				throw 'You have no permission to draw.';
