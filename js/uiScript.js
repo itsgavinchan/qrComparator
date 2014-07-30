@@ -13,7 +13,8 @@
 				ecLevel: $("#eclevel").val(),
 				minVersion: parseInt($("#minversion").val(), 10),
 				text: $("#text").val(),
-				background: '#FFFFFF',
+				background: white,
+				color: black,
 				size: $(container).width()
 			};
 
@@ -116,18 +117,12 @@
 			// the objects that need to be reset. 
 			controller.resetController( 'original', 'modifiable', 'differences' );
 
+			$("#brushSize").val( Math.floor( controller.modifiable.containerModuleLength ) );
+			$("#brush").text( $("#brushSize").val() );
+
 			// Clear the comparator canvas because it's to show differences between two QR codes
 			controller.comparator.clearCanvas();
 			controller.comparator.showCanvasGrid('#000000');
-
-			// Have a listener for the modifiable canvas in the case of the bruteforce, manual technique
-			controller.modifiable.canvas.addEventListener('mousedown', function(evt) {
-
-				var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
-				
-				controller.invert( index );
-
-			}, false);
 
 			$('#decoded').val( '' );
 
@@ -139,11 +134,13 @@
 
 		reset();
 
+		var action = $('#attackMode').val();
+
 		$("#simulate").on("click", function(){
 
-			var action = $('#attackMode').val();
+			action = $('#attackMode').val();
 
-			var automaticAtk = function( ){
+			var invertAttack = function( ){
 				var index = { 
 					x: Math.floor( ( Math.random() * moduleCount ) ), 
 					y: Math.floor( ( Math.random() * moduleCount ) )
@@ -155,16 +152,61 @@
 				decodeQR();
 
 				// See the global error catcher at the top of this file
-				setTimeout(automaticAtk, 10);
+				setTimeout(invertAttack, 10);
+
+			};
+
+			var colorAttack = function( color ){
+				var index = { 
+					x: Math.floor( ( Math.random() * moduleCount ) ), 
+					y: Math.floor( ( Math.random() * moduleCount ) )
+				};
+
+				// console.log( index.x + ', ' + index.y ); 
+
+				while ( !controller.targetColor( index, color ) ){
+					index = { 
+						x: Math.floor( ( Math.random() * moduleCount ) ), 
+						y: Math.floor( ( Math.random() * moduleCount ) )
+					};
+				}
+				decodeQR();
+
+				// See the global error catcher at the top of this file
+				setTimeout(colorAttack, 10, color);
 
 			};
 
 			switch( action ) {
 				case 'manual':
-					break;
-				case 'automatic':
+					// Have a listener for the modifiable canvas in the case of the bruteforce, manual technique
+						controller.modifiable.canvas.addEventListener('mousedown', function(evt) {
+							if( action == 'manual' ){
+								var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
+								
+								controller.invert( index );
+							}
+						}, false);
 
-					automaticAtk();
+					break;
+				case 'deface':
+
+						controller.modifiable.canvas.addEventListener('mousedown', function(evt) {
+							if( action == 'deface' ){
+								var mouse = controller.modifiable.getMousePos( evt );
+								controller.modifiable.drawMouse(mouse, $('#color').val(), $('#brushSize').val() );
+							}
+						}, false);
+
+					break;
+				case 'invert':
+
+					invertAttack();
+
+					break;
+				case 'color':
+
+					colorAttack( $('#color').val() );
 
 					break;
 				default:
@@ -186,10 +228,17 @@
 			$("#minVer").text( $("#minversion").val() );
 		});
 
+		$("#brushSize").on("input change", function(){
+			$("#brush").text( $("#brushSize").val() );
+		});
+
+		$(window).resize(function() {
+			resizeAllQRs();
+			controller.resetResize( 'original', 'modifiable', 'differences' );
+			$("#brushSize").val( controller.modifiable.containerModuleLength );
+			$("#brush").text( $("#brushSize").val() );
+		});
+
 	});
 
-	
-	$(window).resize(function() {
-		resizeAllQRs();
-	});
 }(jQuery));

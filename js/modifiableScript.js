@@ -9,7 +9,6 @@
 		    return ((r << 16) | (g << 8) | b).toString(16);
 		};
 
-
 	function CanvasObject(container, enableModification) {
 
 		// Class Variables
@@ -30,17 +29,30 @@
 			this.canvas = document.getElementById(container).children[0];
 			this.canvasContainer = $('#' + container + ' > canvas' );
 			this.context = this.canvas.getContext('2d');
+			this.resetResize( container );
+		};
+
+		this.resetResize =  function(container){
 			this.canvasModuleLength = this.canvas.width / moduleCount;
 			this.containerModuleLength = this.canvasContainer.width() / moduleCount;
 			this.ratio = this.canvasModuleLength / this.containerModuleLength;
 		};
 
-		// Get the position of the mouse relative to the canvas
+		// Get the position of the mouse relative to the container
 		this.getMousePos = function (evt) {
 			var rect = this.canvas.getBoundingClientRect();
 			return {
 				x: evt.clientX - rect.left,
 				y: evt.clientY - rect.top
+			};
+		};
+
+		// Get the position of the mouse relative to the canvas
+		this.getMouseRatio = function (evt) {
+			var rect = this.canvas.getBoundingClientRect();
+			return {
+				x: (evt.clientX - rect.left) / this.canvas.width,
+				y: (evt.clientY - rect.top) / this.canvas.width
 			};
 		};
 
@@ -133,7 +145,19 @@
 				throw "You've no permission to invert the color of this canvas";
 			}
 		};
-		
+
+		this.drawMouse = function( mouse, color, brushDiameter ){
+			if( this.enableModification ) {
+				var offsetSize = brushDiameter * this.ratio;
+
+				this.context.fillStyle = color;
+				this.context.fillRect( mouse.x * this.ratio - offsetSize * 0.5, mouse.y * this.ratio - offsetSize * 0.5, offsetSize, offsetSize );
+			}
+			else {
+				throw 'You have no permission to draw.';
+			}
+		};
+
 	};
 
 	function CanvasController( original, modifiable, comparator ){
@@ -147,10 +171,15 @@
 
 		// Resets the CanvasObjects
 		this.resetController = function( original, modifiable, comparator ){
-			console.log( 'ya');
 			this.original.resetCanvas( original );
 			this.modifiable.resetCanvas( modifiable );
 			this.comparator.resetCanvas( comparator );
+		};
+
+		this.resetResize =  function(container){
+			this.original.resetResize( original );
+			this.modifiable.resetResize( modifiable );
+			this.comparator.resetResize( comparator );
 		};
 
 		// Compares the color of the modified QR code and the original QR code based on index count
@@ -190,42 +219,19 @@
 			return true;
 		};
 
+		this.targetColor = function( index, color ){
+			if( this.modifiable.getHexColorByIndex(index) == color ){
+				this.invert( index );
+				return true;
+			}
+
+			return false;
+		};
+
+		this.deface = function(evt){
+
+		};
+
 	}
-
-	// $(function () {
-	// 	var reset = function(){
-
-	// 		// Recall: Version 1 has 21 modules. Each higher version number comprises 4 additional modules per side
-	// 		moduleCount = 21 + (parseInt($("#finalVer").text()) - 1) * 4;
-
-	// 		// Create the controller, which needs to be done at each new QR code generated
-	// 		var controller = new CanvasController( 'original', 'modifiable', 'differences' );
-
-	// 		// Clear the comparator canvas because it's to show differences between two QR codes
-	// 		controller.comparator.clearCanvas();
-	// 		controller.comparator.showCanvasGrid('#000000');
-
-	// 		// Have a listener for the modifiable canvas in the case of the bruteforce, manual technique
-	// 		controller.modifiable.canvas.addEventListener('mousedown', function(evt) {
-
-	// 			var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
-	// 			console.log( controller.modifiable.getHexColorByIndex(index) );
-				
-	// 			if( controller.modifiable.getHexColorByIndex(index) == white ){
-	// 				controller.modifiable.changeColorByIndex( index, black );
-	// 			}
-	// 			else{
-	// 				controller.modifiable.changeColorByIndex( index, white );
-	// 			}
-				
-	// 			controller.compare( index );
-
-	// 		}, false);
-	// 	};
-
-	// 	reset();
-	// 	$("#updateQR").on("click", reset);
-		
-	// });
 
 // }(jQuery));

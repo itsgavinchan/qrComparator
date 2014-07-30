@@ -19,8 +19,10 @@
             <label for="attackMode">METHOD OF ATTACK</label>
             <div class="input-group">
                 <select id="attackMode" class="form-control">
-                    <option value="manual" selected="selected">Manual Module Attack</option>
-                    <option value="automatic" >Automated Random Attack</option>
+                    <option value="manual" >Manual Module Attack</option>
+                    <option value="deface" selected="selected" >Manual Defacement Attack</option>
+                    <option value="invert" >Automated Invert Attack</option>
+                    <option value="color" >Automated Single-Color Attack</option>
                 </select>
                 <span class="input-group-btn">
                     <button class="btn btn-default" type="button" id="simulate">Simulate</button>
@@ -66,9 +68,24 @@
                 <label for="minversion">VERSION: (MIN <span id="minVer">1</span>, MAX <span id="finalVer"></span>)</label>
                 <input id="minversion" type="range" value="1" min="1" max="10" step="1" />
             </div>
-            <button id="updateQR" class="btn btn-primary btn-block">GENERATE</button>
-            <button id="decodeQR" class="btn btn-primary btn-block">DECODE</button>
 
+            <div class="form-group">
+                <button id="updateQR" class="btn btn-primary btn-block">GENERATE</button>
+                <button id="decodeQR" class="btn btn-primary btn-block">DECODE</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="color">COLOR: </label>
+                <select id="color" class="form-control">
+                    <option value="#000000" selected="selected" >Black Ink</option>
+                    <option value="#FFFFFF" >White-Out</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="brushSize">BRUSH SIZE: <span id="brush">1</span></label>
+                <input id="brushSize" type="range" value="1" min="1" max="50" step="1" />
+            </div>
         </div>
 
 
