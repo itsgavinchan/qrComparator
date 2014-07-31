@@ -1,14 +1,17 @@
-(function ($) {
-
-	window.onerror = function errorHandler(msg, url, line) {
-
-		$('#decoded').val( 'ERR: Decoding the QR code failed. ' + msg);
-		window.clearTimeout();
-		// Just let default handler run.
-		return false;
-	};
+clearTimeout(function ($) {
 	
-	var updateQRCode = function(container) {
+	var options = {
+			versionNumber: parseInt( $('#minVer').text() ),
+			finder: $('#targetFinder').prop( 'checked' ),
+			separators: $('#targetSeparators').prop( 'checked' ),
+			alignment: $('#targetAlignment').prop( 'checked' ),
+			timing: $('#targetTiming').prop( 'checked' ),
+			versionT: $('#targetVersion').prop( 'checked' ),
+			dataT: $('#targetData').prop( 'checked' ),
+			isAttackable: false
+		},
+
+		updateQRCode = function(container) {
 			var options = {
 				ecLevel: $("#eclevel").val(),
 				minVersion: parseInt($("#minversion").val(), 10),
@@ -26,7 +29,7 @@
 			if( $( window ).width() >= 768 ){
 				$( "canvas" ).each( function( index ) {
 
-					var size = Math.min( 300, $(this).parent().width() );
+					var size = Math.min( 200, $(this).parent().width() );
 					$(this).width( size );
 					$(this).height( size );
 
@@ -75,7 +78,7 @@
 
 		decodeQR = function(){
 			if( $("#text").val().replace(/ /g,'') == '' ){ 
-				alert("Cannot decode empty string (even if with whitespace)."); 
+				throw "Cannot decode empty string (even if with whitespace)."; 
 
 			}
 			else{
@@ -92,20 +95,51 @@
 			}
 
 			return $('#decoded').val( );
-		};
+		}
+		;
 
+	window.onerror = function errorHandler(msg, url, line) {
+		$('#decoded').val( 'ERR: ' + msg);
+		window.clearTimeout();
+		// Just let default handler run.
+		return false;
+	};
 		
 	$(function () {
 
+		// First, initialize the QR codes.
 		updateAllQRs();
-		window.clearTimeout();
 		
 		// Create the controller, which needs to be done only once when the page loads
 		var controller = new CanvasController( 'original', 'modifiable', 'differences' );
-		
+
+		// Function Definitions
+		var updateOptions = function(){
+			options.versionNumber = parseInt( $('#minVer').text() );
+			options.finder = $('#targetFinder').prop( 'checked' );
+			options.separators = $('#targetSeparators').prop( 'checked' );
+			options.alignment = $('#targetAlignment').prop( 'checked' );
+			options.timing = $('#targetTiming').prop( 'checked' );
+			options.versionT = $('#targetVersion').prop( 'checked' );
+			options.dataT = $('#targetData').prop( 'checked' );
+
+			if(  options.finder || options.separators 
+				|| (options.alignment && options.versionNumber > 1) 
+				|| options.timing || options.dataT 
+				|| (options.versionT && options.versionNumber > 6) ){
+				options.isAttackable = true;
+			}
+			else { options.isAttackable = false; } 
+
+			// console.log( options );
+			controller.modifiable.resetPermissibleArea( options );
+			controller.modifiable.logPermissibleArea();
+		};
+
 		var reset = function(){
 
 			updateAllQRs();
+			updateOptions();
 			window.clearTimeout();
 
 			$('#decoded').val( '' );
@@ -116,7 +150,13 @@
 
 			// To avoid lag and the over-creation of objects, the controller is reset instead to simply replace the 
 			// the objects that need to be reset. 
-			controller.resetController( 'original', 'modifiable', 'differences' );
+			controller.resetController( 
+				{ id: 'original', options: options }, 
+				{ id: 'modifiable', options: options }, 
+				{ id: 'differences', options: options }
+			);
+
+			updateOptions();
 
 			$("#brushSize").val( Math.floor( controller.modifiable.containerModuleLength ) );
 			$("#brush").text( $("#brushSize").val() );
@@ -125,19 +165,22 @@
 			controller.comparator.clearCanvas();
 			controller.comparator.showCanvasGrid('#000000');
 
-			$('#decoded').val( '' );
+			decodeQR();
 
 		};
 
-		reset();
-
-		var action = $('#attackMode').val();
-
 		var invertAttack = function( ){
 			var index = { 
-				x: Math.floor( ( Math.random() * moduleCount ) ), 
-				y: Math.floor( ( Math.random() * moduleCount ) )
+				x: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) ), 
+				y: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) )
 			};
+
+			while ( !controller.modifiable.isAttackable( index ) ){
+				index = { 
+					x: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) ), 
+					y: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) )
+				};
+			}
 
 			controller.invert( index );
 
@@ -151,15 +194,16 @@
 		};
 
 		var colorAttack = function( color ){
+
 			var index = { 
-				x: Math.floor( ( Math.random() * moduleCount ) ), 
-				y: Math.floor( ( Math.random() * moduleCount ) )
+				x: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) ), 
+				y: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) )
 			};
 
-			while ( !controller.targetColor( index, color ) ){
+			while ( !controller.targetColor( index, color ) && !controller.modifiable.isAttackable( index ) ){
 				index = { 
-					x: Math.floor( ( Math.random() * moduleCount ) ), 
-					y: Math.floor( ( Math.random() * moduleCount ) )
+					x: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) ), 
+					y: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) )
 				};
 			}
 
@@ -175,22 +219,42 @@
 		var recordIndex = function( x, y ){
 			$('#attackLog').text( $('#attackLog').text() + "[" + x + ", " + y + "] " );
 		};
+		
+		$(window).resize(function() {
+			resizeAllQRs();
+			controller.resetResize( 'original', 'modifiable', 'differences' );
+			$("#brushSize").val( controller.modifiable.containerModuleLength );
+			$("#brush").text( $("#brushSize").val() );
+		});
+
+		// Button Triggers
+
+		$("#updateQR").on("click", reset );
+		$("#toggleTop").on("click", toggleTop );
+		$("#decodeQR").on("click", decodeQR );
 
 		$("#simulate").on("click", function(){
+			window.clearTimeout(); 
+			action = $('#attackMode').val(); 
 
-			action = $('#attackMode').val();
+			if ( !controller.modifiable.attackable && action != 'deface' ){ 
+				var err = "There are no valid target areas to attack."; 
+				alert( err + "Please choose a target area. Remember that an alignment pattern doesn't exist in Version 1 QR codes and version data only exists in QR codes of Version 7 or higher. ");
+				throw err;
+			}
 
 			switch( action ) {
 				case 'manual':
-					// Have a listener for the modifiable canvas in the case of the bruteforce, manual technique
 
-						controller.modifiable.canvas.onmousedown = function(evt) {
-				            if( action == 'manual' ){
-								var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
+					controller.modifiable.canvas.onmousedown = function(evt) {
+			            if( action == 'manual' ){6
+							var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
+							if ( controller.modifiable.isAttackable( index ) ){
 								recordIndex( index.x, index.y );
 								controller.invert( index );
 							}
-				        };
+						}
+			        };
 
 					break;
 				case 'deface':
@@ -230,31 +294,7 @@
 			}
 		});
 
-		$("#attackMode").on("input change", function(){
-			switch( $("#attackMode").val() ){
-				case 'manual':
-					$('#log').show();
-					break;
-				case 'deface':
-					$('#log').hide();
-					break;
-				case 'invert':
-					$('#log').show();
-					break;
-				case 'color':
-					$('#log').show();
-					break;
-				default:
-					throw 'Not a Simulation Option';
-					break;
-			}
-		});
-
-		$("#updateQR").on("click", reset );
-		
-		$("#toggleTop").on("click", toggleTop );
-		$("#decodeQR").on("click", decodeQR );
-
+		// Input Triggers 
 		$("#text").on("input change", function(){
 			console.log($("#textChar").text());
 		});
@@ -266,14 +306,35 @@
 		$("#brushSize").on("input change", function(){
 			$("#brush").text( $("#brushSize").val() );
 		});
-		$("#simulate").trigger('click');
 
-		$(window).resize(function() {
-			resizeAllQRs();
-			controller.resetResize( 'original', 'modifiable', 'differences' );
-			$("#brushSize").val( controller.modifiable.containerModuleLength );
-			$("#brush").text( $("#brushSize").val() );
+		$(".target").on("input change", updateOptions );
+
+		$("#attackMode").on("input change", function(){
+			switch( $("#attackMode").val() ){
+				case 'manual':
+					$('#log').show();
+					$('#target').show();
+					break;
+				case 'deface':
+					$('#log').hide();
+					$('#target').hide();
+					break;
+				case 'invert':
+					$('#log').show();
+					$('#target').show();
+					break;
+				case 'color':
+					$('#log').show();
+					$('#target').show();
+					break;
+				default:
+					throw 'Not a Simulation Option';
+					break;
+			}
 		});
+
+		reset();
+		$("#simulate").trigger('click');
 
 	});
 

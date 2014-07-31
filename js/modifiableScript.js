@@ -22,14 +22,131 @@
 		this.enableModification = enableModification;
 		this.hasGrid = true;
 		this.defaultGridColor = black;
+		this.permissibleArea = [];
+		this.versionNumber = 0;
+		this.moduleCount = 0;
+		this.attackable = false;
 
 		// Class Methods
+
+		this.resetCanvas = function(container, options){
+			this.canvas = document.getElementById(container).children[0];
+			this.canvasContainer = $('#' + container + ' > canvas' );
+			this.context = this.canvas.getContext('2d');
+			this.resetResize( container );
+			this.versionNumber = options.versionNumber;
+			this.moduleCount = 21 + (this.versionNumber - 1) * 4;
+			this.resetPermissibleArea( options );
+			console.log( this );
+		};
 
 		this.resetCanvas = function(container){
 			this.canvas = document.getElementById(container).children[0];
 			this.canvasContainer = $('#' + container + ' > canvas' );
 			this.context = this.canvas.getContext('2d');
 			this.resetResize( container );
+			this.moduleCount = 21 + (moduleCount - 1) * 4;
+			this.versionNumber = (this.moduleCount - 21) / 8 + 1;
+		};
+
+		this.resetPermissibleArea = function( options ){
+			console.log( options );
+			this.attackable = options.isAttackable;
+			this.permissibleArea = [];
+
+			for( var x = 0; x < moduleCount; x++ ){
+				this.permissibleArea[x] = [];
+				for( var y = 0; y < moduleCount; y++ ){
+					this.permissibleArea[x][y] = 0;
+
+					// DATA
+					if( options.dataT ){
+						this.permissibleArea[x][y] = 4;
+					}
+
+					// TIMING
+					if( ( x == 6 && ( y > 7 && y < this.moduleCount - 7 - 1) ) || 
+						( y == 6  && ( x > 7 && x < this.moduleCount - 7 - 1) ) ){
+						if( options.timing ){ this.permissibleArea[x][y] = 1; }
+						else { this.permissibleArea[x][y] = 0; }
+					}
+
+					// SEPARATORS
+					if( x == 7 && ( y <= 7 || y >= this.moduleCount - 7 - 1 ) ) {
+						if( options.separators ){ this.permissibleArea[x][y] = 2; }
+						else { this.permissibleArea[x][y] = 0; }
+					}
+					else if ( x == this.moduleCount - 7 - 1 && y <= 7 ){
+						if( options.separators ){ this.permissibleArea[x][y] = 2; }
+						else { this.permissibleArea[x][y] = 0; }
+					}
+					if( y == 7 && ( x <= 7 || x >= this.moduleCount - 7 - 1 ) ) {
+						if( options.separators ){ this.permissibleArea[x][y] = 2; }
+						else { this.permissibleArea[x][y] = 0; }
+					}
+					else if ( y == this.moduleCount - 7 - 1 && x <= 7 ){
+						if( options.separators ){ this.permissibleArea[x][y] = 2; }
+						else { this.permissibleArea[x][y] = 0; }
+					}
+
+					// FINDERS
+					
+					// x < 7: Top finders
+					// y < 7: Only top left finder
+					// y > this.moduleCount - 7 - 1 : Only top right finder
+					if( x < 7 && ( y < 7 || y > this.moduleCount - 7 - 1 ) ){
+						if( options.finder ){ this.permissibleArea[x][y] = 3; }
+						else { this.permissibleArea[x][y] = 0; }
+					}
+					// x > this.moduleCount - 7 - 1: Bottom finder
+					// y < 7: Only bottom left finder
+					else if ( x > this.moduleCount - 7 - 1 && y < 7 ){
+						if( options.finder ){ this.permissibleArea[x][y] = 3; }
+						else { this.permissibleArea[x][y] = 0; }
+					}
+
+					// VERSION
+					if ( options.versionNumber >= 7 ){
+						// Top Right Version Info Area
+						// y < 6: Length from timing pattern up
+						// x < this.moduleCount - 7 - 1: Amount away from the right + 3 in width
+						if( y < 6 && x < this.moduleCount - 7 - 1 && x > this.moduleCount - 7 - 1 - 4 ){
+							if( options.versionT ){ this.permissibleArea[x][y] = 4; }
+							else { this.permissibleArea[x][y] = 0; }
+						}
+						// Bottom Left Version Info Area
+						// x < 6: Length from timing pattern left
+						// y < this.moduleCount - 7 - 1: Amount away from the bottom + 3 in height
+						else if( x < 6 && y < this.moduleCount - 7 - 1 && y > this.moduleCount - 7 - 1 - 4 ){
+							if( options.versionT ){ this.permissibleArea[x][y] = 4; }
+							else { this.permissibleArea[x][y] = 0; }
+						}
+					}
+
+					// ALIGNMENT
+					if( options.alignment && options.versionNumber > 1 ){
+
+					}
+
+				}
+			}
+
+		}
+
+		this.logPermissibleArea = function(){
+			var output = "";
+			for( var x = 0; x < moduleCount; x++ ){
+				for( var y = 0; y < moduleCount; y++ ){
+					output += this.permissibleArea[x][y];
+				}
+				output += "\n";
+			}
+			console.log(output);
+		};
+
+		this.isAttackable = function( index ){
+			if( this.permissibleArea[index.x][index.y] != 0 ) { return true; }
+			else{ return false; }
 		};
 
 		this.resetResize =  function(container){
@@ -174,6 +291,12 @@
 
 		// Resets the CanvasObjects
 		this.resetController = function( original, modifiable, comparator ){
+			this.original.resetCanvas( original.id, original.options );
+			this.modifiable.resetCanvas( modifiable.id, modifiable.options );
+			this.comparator.resetCanvas( comparator.id, comparator.options );
+		};
+
+		this.resetControllerNoOption = function( original, modifiable, comparator ){
 			this.original.resetCanvas( original );
 			this.modifiable.resetCanvas( modifiable );
 			this.comparator.resetCanvas( comparator );
@@ -184,6 +307,20 @@
 			this.modifiable.resetResize( modifiable );
 			this.comparator.resetResize( comparator );
 		};
+
+		// this.logCanvases = function(){
+		// 	// console.log( 'Original' );
+		// 	// this.original.logPermissibleArea();	
+		// 	// console.log( 'Modifiable' );
+		// 	this.modifiable.logPermissibleArea();	
+		// 	// console.log( 'Comparator' );
+		// 	// this.comparator.logPermissibleArea();			
+		// }
+
+		// this.resetPermissibleAreas = function( options ){
+		// 	this.modifiable.resetPermissibleArea( options );	
+		// 	this.logCanvases();		
+		// }
 
 		// Compares the color of the modified QR code and the original QR code based on index count
 		// This implies that the original and the modifiable must have the same module count
@@ -207,6 +344,14 @@
 				return '#FFFF00';
 			}
 
+		};
+
+		this.compareCanvases = function(){
+			for( var x = 0; x < moduleCount; x++ ){
+				for( var y = 0; y < moduleCount; y++ ){
+					this.compare( {x:x, y:y} );
+				}
+			}
 		};
 
 		this.invert = function(index){

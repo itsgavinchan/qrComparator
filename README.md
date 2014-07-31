@@ -5,6 +5,9 @@ qrComparator
 This project uses a modified [larsung.de's jQuery.qrcode-0.8.0.js](http://larsjung.de/qrcode/) as the QR Code generator in conjunction with [LazarSoft's jsqrcode](https://github.com/LazarSoft/jsqrcode) to decode QR codes. The purpose of this project is to display visual differences between the original QR code and a modified QR code, and will attempt to visually depict a variety of attacks on QR codes. For layout purposes, this page is formatted with [Twitter BootStrap](getbootstrap.com/) and aimed to be mobile-responsive.
 
 ### Changelog (Ordered Newest to Oldest)
+* **2014.07.31**
+  * Added /js/compareScript.js that is essentially similar to uiScript.js but handles only the actions required for that specific page because resets and sidebars are essentially different.
+  * Added compare.html pages to contrast the differences in modules between '#original' and '#targetted,' although a precaution was made to keep the two QR codes at the same version level to simplify comparison.
 * **2014.07.30**
   * Modified /js/uiScript.js to draw on the canvas while the mouse is over.
   * Modified /js/uiScript.js to record and append to '#attackLog' the indicies affected.
@@ -13,7 +16,7 @@ This project uses a modified [larsung.de's jQuery.qrcode-0.8.0.js](http://larsju
   * Modified /js/modifiableScript.js CanvasController's targetColor method.
   * Modified /js/modifiableScript.js with resize methods that changes the brush upon window resize.
   * Modified /js/uiScript.js to simulate the manual defacement attack on the '#modifiable' canvas. Change needs to eventually reflect on the '#differences' canvas.
-  * Added to index.html's #attackMode selection the option 'Manual Defacement Attack' to deface a QR code by mouse without any specific target to pixel modules. The color selection option is applicable in this attack and the brush size input slider has been added as well to dynamically change the size of the brush. 
+  * Added to index.html's #attackMode selection the option 'Manual Defacement Attack' to deface a QR code by mouse without any specific target to pixel modules. The color selection option is applicable in this attack and the brush size input slider has been added as well to dynamically change the size of the brush.
   * Modified /js/uiScript.js to simulate an automatic attack on only the specified color in correspondence to the 'Automated Single-Color Attack'
   * Added to index.html's #attackMode selection the option 'Automated Single-Color Attack' to target a single color, either black or white, to simulate a defacing scenario where an attacker may deface a QR code in public with only one tool. The color selection option has been made available in the two colors.
 * **2014.07.29**
@@ -38,7 +41,6 @@ This project uses a modified [larsung.de's jQuery.qrcode-0.8.0.js](http://larsju
   * Added /js/uiScript.js to handle index.html's field input changes and mobile responsiveness.
 
 ### To Be Implemented (Order of Importance)
-* Make the differences in the defacement attack reflect on the '#differences' canvas and to be it with mousedown and mouseover.
-* Implement different simulated attacks on QR codes, beginning with attack on code words now that manual blind-attacks are implemented.
-* Make top two QR codes mobile responsive upon browser window change.
-* Make sidebar togglable and visible in mobile browser view.
+* Optimize compare.html to take less computation time.
+* Make top two QR codes mobile responsive upon browser window change (if time permits).
+* Make sidebar togglable and visible in mobile browser view (if time permits).

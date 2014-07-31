@@ -58,8 +58,9 @@ Decoder.decode=function(bits)
 {
 	var parser = new BitMatrixParser(bits);
 	var version = parser.readVersion();
-	$("#finalVer").text( version.versionNumber );
 	var ecLevel = parser.readFormatInformation().ErrorCorrectionLevel;
+	$("#decodedVer").text( version.versionNumber );
+	$("#decodedEC").text( ecLevel.name );
 	
 	// Read codewords
 	var codewords = parser.readCodewords();
@@ -91,6 +92,7 @@ Decoder.decode=function(bits)
 	
 	// Decode the contents of that stream of bytes
 	var reader = new QRCodeDataBlockReader(resultBytes, version.VersionNumber, ecLevel.Bits);
+	console.log( reader );
 	return reader;
 	//return DecodedBitStreamParser.decode(resultBytes, version, ecLevel);
 }

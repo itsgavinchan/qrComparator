@@ -14,21 +14,6 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-                        
-            <div class="form-group">
-                <label for="attackMode">METHOD OF ATTACK</label>
-                <div class="input-group">
-                    <select id="attackMode" class="form-control">
-                        <option value="manual" selected="selected" >Manual Module Attack</option>
-                        <option value="deface" >Manual Defacement Attack</option>
-                        <option value="invert" >Automated Invert Attack</option>
-                        <option value="color" >Automated Single-Color Attack</option>
-                    </select>
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" id="simulate">Simulate</button>
-                    </span>
-                </div><!-- /input-group -->
-            </div><!-- /form-group -->
             
             <div class="form-group">
                 <label for="timing">ATTACK FREQUENCY </label>
@@ -39,61 +24,6 @@
                     <option value="500">0.5 second</option>
                     <option value="1000" >1 second</option>
                 </select>
-            </div>
-
-            <div id="target" class="form-group">
-                <div class="panel-group" id="accordion">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <!-- <a data-toggle="collapse" href="#collapseDiff" data-parent="#accordion"> -->
-                                <a data-toggle="collapse" href="#collapseTarget" data-parent="#accordion">
-                                    TARGET AREAS
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseTarget" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <div class="checkbox">
-                                    <label>
-                                        <input id="targetFinder" type="checkbox" class="target" checked> Finder Pattern
-                                    </label>
-                                </div>
-
-                                <div class="checkbox">
-                                    <label>
-                                        <input id="targetSeparators" type="checkbox" class="target" checked> Separators
-                                    </label>
-                                </div>
-                                
-                                <div class="checkbox">
-                                    <label>
-                                        <input id="targetAlignment" type="checkbox" class="target" checked> Alignment Pattern
-                                    </label>
-                                </div>
-
-                                <div class="checkbox">
-                                    <label>
-                                        <input id="targetTiming" type="checkbox" class="target" checked> Timing Pattern
-                                    </label>
-                                </div>
-
-                                <div class="checkbox">
-                                    <label>
-                                        <input id="targetVersion" type="checkbox" class="target" checked> Version Data
-                                    </label>
-                                </div>
-
-                                <div class="checkbox">
-                                    <label>
-                                        <input id="targetData" type="checkbox" class="target" checked> Data
-                                    </label>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             
             <div id="log" class="form-group">
@@ -116,26 +46,13 @@
             </div>
 
             <div class="form-group">
-                <label for="color">COLOR </label>
-                <select id="color" class="form-control">
-                    <option value="#000000" selected="selected" >Black Ink</option>
-                    <option value="#FFFFFF" >White-Out</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="brushSize">BRUSH SIZE: <span id="brush">1</span></label>
-                <input id="brushSize" type="range" value="1" min="1" max="50" step="1" />
-            </div>
-
-            <div class="form-group">
                 <label for="text">ORIGINAL CONTENT <span id="textChar"></span></label>
                 <textarea id="text" class="form-control" rows="3" placeholder="Enter Content Here">0</textarea>
             </div>
 
             <div class="form-group">
-                <label for="text">DECODED CONTENT</label>
-                <textarea id="decoded" class="form-control" rows="3" placeholder="Decoded Content Appears Here"></textarea>
+                <label for="text">DESIRED CONTENT</label>
+                <textarea id="desired" class="form-control" rows="3" placeholder="Enter Target Content Here">1</textarea>
             </div>
 
             <div class="form-group">
@@ -153,11 +70,6 @@
                 <input id="minversion" type="range" value="1" min="1" max="6" step="1" />
             </div>
 
-            <div class="form-group">
-                <button id="updateQR" class="btn btn-primary btn-block">GENERATE</button>
-                <button id="decodeQR" class="btn btn-primary btn-block">DECODE</button>
-            </div>
-
             <div id="log" class="form-group">
                 <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
@@ -171,8 +83,15 @@
                         </div>
                         <div id="collapseInfo" class="panel-collapse collapse">
                             <div id="decodedInfo" class="panel-body">
-                                Version: <span id="decodedVer"></span><br>
-                                Error Correction: <span id="decodedEC"></span><br>
+
+                                Original Version: <span id="originalVer"></span><br>
+                                Max Error Correction: <span id="originalEC"></span><br>
+
+                                Target Version: <span id="targettedVer"></span><br>
+                                Max Error Correction: <span id="targettedEC"></span><br>
+
+                                Max Version: <span id="decodedVer"></span><br>
+                                Max Error Correction: <span id="decodedEC"></span><br>
                             </div>
                         </div>
                     </div>
@@ -208,13 +127,13 @@
                             <h4 class="panel-title">
                                 <!-- <a data-toggle="collapse" href="#collapseDiff" data-parent="#accordion"> -->
                                 <a data-toggle="collapse" data-parent="#accordion">
-                                    MODIFICATIONS
+                                    TARGET QR CODE
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseDiff" class="panel-collapse collapse in topQR">
-                            <div id="differences" class="panel-body QRCode">
-                                MODIFICATIONS ON ORIGINAL QR CODE SHOWN HERE
+                        <div id="collapseDesired" class="panel-collapse collapse in topQR">
+                            <div id="targetted" class="panel-body QRCode">
+                                TARGET QR CODE SHOWN HERE
                             </div>
                         </div>
                     </div>
@@ -226,14 +145,15 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
-                                    MODIFIABLE QR CODE
+                                <!-- <a data-toggle="collapse" href="#collapseDiff" data-parent="#accordion"> -->
+                                <a data-toggle="collapse" data-parent="#accordion">
+                                    MODIFICATIONS
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseFour" class="panel-collapse collapse in">
-                            <div id="modifiable" class="panel-body QRCode">
-                                MODIFIABLE QR CODE SHOWN HERE
+                        <div id="collapseDiff" class="panel-collapse collapse in topQR">
+                            <div id="differences" class="panel-body QRCode">
+                                MODIFICATIONS ON ORIGINAL QR CODE SHOWN HERE
                             </div>
                         </div>
                     </div>
@@ -270,7 +190,7 @@
     <script type="text/javascript" src="js/LazarSoft-jsqrcode/alignpat.js"></script>
     <script type="text/javascript" src="js/LazarSoft-jsqrcode/databr.js"></script>
 
-    <script src="js/uiScript.js"></script>
+    <script src="js/compareScript.js"></script>
     <script src="js/modifiableScript.js"></script>
 
 </body>
