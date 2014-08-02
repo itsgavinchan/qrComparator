@@ -5,6 +5,11 @@ qrComparator
 This project uses a modified [larsung.de's jQuery.qrcode-0.8.0.js](http://larsjung.de/qrcode/) as the QR Code generator in conjunction with [LazarSoft's jsqrcode](https://github.com/LazarSoft/jsqrcode) to decode QR codes. The purpose of this project is to display visual differences between the original QR code and a modified QR code, and will attempt to visually depict a variety of attacks on QR codes. For layout purposes, this page is formatted with [Twitter BootStrap](getbootstrap.com/) and aimed to be mobile-responsive.
 
 ### Changelog (Ordered Newest to Oldest)
+* **2014.08.01**
+  * Modified compare.html and /hs/compareScript.js to have a button to trigger comparison, an attempt to make it less computationally heavy.
+  * Modified /js/modifiableScript.js and /js/uiScript.js to handle the bugs found in the permissibleArea, alignment pattern now detected via table found in /js/modifiableScript.js. I also came across a bug in the reader that can't seem to be fixed despite the fact that it generates fine. It may be an unresolved issue in [jsqrcode](https://github.com/LazarSoft/jsqrcode)'s qrcode.js.
+  * Modified /js/modifiableScript.js to correctly handle permissible area variable and to put in checks for whether or not a module is attackable. Each time the controller's invert is executed, 
+  * Modified /js/uiScript.js to fix conditional in while loop of colorAttack funciton, restructure entire file to organize logic, added an alert for if user wants to read instruction. 
 * **2014.07.31**
   * Added /js/compareScript.js that is essentially similar to uiScript.js but handles only the actions required for that specific page because resets and sidebars are essentially different.
   * Added compare.html pages to contrast the differences in modules between '#original' and '#targetted,' although a precaution was made to keep the two QR codes at the same version level to simplify comparison.
@@ -41,6 +46,5 @@ This project uses a modified [larsung.de's jQuery.qrcode-0.8.0.js](http://larsju
   * Added /js/uiScript.js to handle index.html's field input changes and mobile responsiveness.
 
 ### To Be Implemented (Order of Importance)
-* Optimize compare.html to take less computation time.
 * Make top two QR codes mobile responsive upon browser window change (if time permits).
 * Make sidebar togglable and visible in mobile browser view (if time permits).

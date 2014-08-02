@@ -92,7 +92,6 @@ Decoder.decode=function(bits)
 	
 	// Decode the contents of that stream of bytes
 	var reader = new QRCodeDataBlockReader(resultBytes, version.VersionNumber, ecLevel.Bits);
-	console.log( reader );
 	return reader;
 	//return DecodedBitStreamParser.decode(resultBytes, version, ecLevel);
 }

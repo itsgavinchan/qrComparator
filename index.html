@@ -14,7 +14,11 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-                        
+            
+            <div class="form-group">
+                <button id="instructions" class="btn btn-default btn-block">INSTRUCTIONS</button>
+            </div>
+
             <div class="form-group">
                 <label for="attackMode">METHOD OF ATTACK</label>
                 <div class="input-group">
@@ -56,13 +60,13 @@
                             <div class="panel-body">
                                 <div class="checkbox">
                                     <label>
-                                        <input id="targetFinder" type="checkbox" class="target" checked> Finder Pattern
+                                        <input id="targetFinder" type="checkbox" class="target" > Finder Pattern
                                     </label>
                                 </div>
 
                                 <div class="checkbox">
                                     <label>
-                                        <input id="targetSeparators" type="checkbox" class="target" checked> Separators
+                                        <input id="targetSeparators" type="checkbox" class="target" > Separators
                                     </label>
                                 </div>
                                 
@@ -74,19 +78,19 @@
 
                                 <div class="checkbox">
                                     <label>
-                                        <input id="targetTiming" type="checkbox" class="target" checked> Timing Pattern
+                                        <input id="targetTiming" type="checkbox" class="target" > Timing Pattern
                                     </label>
                                 </div>
 
                                 <div class="checkbox">
                                     <label>
-                                        <input id="targetVersion" type="checkbox" class="target" checked> Version Data
+                                        <input id="targetVersion" type="checkbox" class="target" > Version Data
                                     </label>
                                 </div>
 
                                 <div class="checkbox">
                                     <label>
-                                        <input id="targetData" type="checkbox" class="target" checked> Data
+                                        <input id="targetData" type="checkbox" class="target" > Data
                                     </label>
                                 </div>
 
@@ -115,22 +119,22 @@
                 </div>
             </div>
 
-            <div class="form-group">
+            <div id="colorCtrl" class="form-group">
                 <label for="color">COLOR </label>
                 <select id="color" class="form-control">
-                    <option value="#000000" selected="selected" >Black Ink</option>
-                    <option value="#FFFFFF" >White-Out</option>
+                    <option value="#000000" selected="selected" >Black</option>
+                    <option value="#ffffff" >White</option>
                 </select>
             </div>
 
-            <div class="form-group">
+            <div id="brushCtrl" class="form-group">
                 <label for="brushSize">BRUSH SIZE: <span id="brush">1</span></label>
                 <input id="brushSize" type="range" value="1" min="1" max="50" step="1" />
             </div>
 
             <div class="form-group">
                 <label for="text">ORIGINAL CONTENT <span id="textChar"></span></label>
-                <textarea id="text" class="form-control" rows="3" placeholder="Enter Content Here">0</textarea>
+                <textarea id="text" class="form-control" rows="3" placeholder="Enter Content Here">00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</textarea>
             </div>
 
             <div class="form-group">

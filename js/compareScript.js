@@ -9,7 +9,6 @@
 				color: black,
 				size: $(container).width()
 			};
-			console.log( container );
 			$(container).empty().qrcode( options );
 		},
 
@@ -108,6 +107,7 @@
 		var reset = function(){
 
 			updateAllQRs( parseInt($("#minversion").val() ) );
+
 			$('#attackLog').empty();
 
 			decodeQR( 'original' );
@@ -124,6 +124,7 @@
 
 			controller.comparator.clearCanvas();
 			controller.comparator.showCanvasGrid('#000000');
+
 			controller.compareCanvases();
 
 		};
@@ -134,14 +135,26 @@
 		
 		$(window).resize(function() {
 			resizeAllQRs();
-			controller.resetResize( 'original', 'modifiable', 'differences' );
+			controller.resetControllerNoOption( 'original', 'targetted', 'differences' );
 			$("#brushSize").val( controller.modifiable.containerModuleLength );
 			$("#brush").text( $("#brushSize").val() );
 		});
 
+		$('#compare').on("click", function(){ reset(); } );
 		// Input Triggers 
-		$("#text").on("input change", reset );
-		$("#desired").on("input change", reset );
+		$("#text").on("input change", function(){
+			updateQRCode( "#original", $("#text").val(), 1);
+			decodeQR( 'original' );
+			resizeAllQRs();
+			controller.original.resetCanvasNoOptions('original');
+		});
+		$("#desired").on("input change", function(){
+			updateQRCode( "#targetted", $("#desired").val(), 1);
+			decodeQR( 'targetted' );
+			resizeAllQRs();
+			controller.modifiable.resetCanvasNoOptions('targetted');
+
+		} );
 
 		$("#minversion").on("input change", function(){
 			updateAllQRs();
