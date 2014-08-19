@@ -80,7 +80,6 @@
 			this.versionNumber = options.versionNumber;
 			this.moduleCount = 21 + (this.versionNumber - 1) * 4;
 			this.resetPermissibleArea( options );
-			// console.log( options );
 		};
 
 		this.resetCanvasNoOptions = function(container){
@@ -107,11 +106,9 @@
 				this.permissibleArea[x] = [];
 				for( var y = 0; y < moduleCount; y++ ){
 					this.permissibleArea[x][y] = 0;
-					// console.log( this.permissibleArea[x][y] );
 
 					// DATA
 					if( options.dataT ){
-						console.log( options.dataT );
 						this.permissibleArea[x][y] = 4;
 					}
 
@@ -222,7 +219,7 @@
 			for( var x = 0; x < moduleCount; x++ ){
 				for( var y = 0; y < moduleCount; y++ ){
 
-					if( this.getHexColorByIndex( {x:x, y:y} ) != color ) { 
+					if( this.getHexColorByIndex( x, y ) != color ) { 
 						this.permissibleArea[x][y] = 0;
 					}
 
@@ -246,19 +243,6 @@
 			}
 
 			return false;
-		};
-
-		this.viewPermissibleArea = function(){
-			var output = "";
-			for( var x = 0; x < moduleCount; x++ ){
-				for( var y = 0; y < moduleCount; y++ ){
-
-					output += this.permissibleArea[x][y];
-
-				}
-				output += "\n";
-			}
-			console.log( output );
 		};
 
 		this.isAttackable = function( x, y ){
