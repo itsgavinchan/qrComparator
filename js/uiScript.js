@@ -6,16 +6,6 @@
 	
 	var attackRunning = null, isAttacking = false;
 
-	$("#simulate").on("click", function(){
-
-		if( isAttacking && attackRunning != null ){
-			isAttacking = false;
-			window.clearTimeout( attackRunning ); 
-			attackRunning = null;
-			return;
-		}
-	});
-
 	$("#text").on("input change load", function(){
 		$("#textChar").text( $("#text").val().length );
 	});
@@ -163,6 +153,7 @@
 		updateAllQRs();
 		updateOptions();
 		currentValue = $('#text').val();
+		action = $('#attackMode').val();
 
 		window.clearTimeout();
 		attackRunning = null;
@@ -196,11 +187,42 @@
 	reset();
 
 	var recordIndex = function( x, y ){
-		$('#attackLog').text( $('#attackLog').text() + "[" + x + ", " + y + "] <br>" );
+		$('#attackLog').text( $('#attackLog').text() + "[" + x + ", " + y + "]" );
 	};
 
-	var automatedAttack = function (condition ){
+	var invertAttack = function( ){
+    	console.log("1");
 
+    	if( !controller.modifiable.attackable ) { throw 'All available targetted areas already attacked.'; }
+
+		isAttacking = true;
+		console.log("2");
+		var index = { 
+			x: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) ), 
+			y: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) )
+		};
+
+		console.log("3");
+		while ( !controller.modifiable.isAttackable( index.x, index.y ) ){
+			index.x = Math.floor( ( Math.random() * controller.modifiable.moduleCount ) );
+			index.y = Math.floor( ( Math.random() * controller.modifiable.moduleCount ) );
+			console.log("31");
+		}
+
+		console.log("4");
+		controller.invert( index.x, index.y );
+
+		recordIndex( index.x, index.y );
+		console.log("5");
+		decodeQR( 'modifiable' );
+		
+		// See the global error catcher at the top of this file
+		if( currentValue == $('#decoded').val() ) {
+			attackRunning = setTimeout(invertAttack, parseInt( $('#timing').val() ) );
+		}
+	};
+
+	var colorAttack = function( color ){
 		if( !controller.modifiable.attackable ) { throw 'All available targetted areas already attacked.'; }
 
 		isAttacking = true;
@@ -210,7 +232,7 @@
 			y: Math.floor( ( Math.random() * controller.modifiable.moduleCount ) )
 		};
 
-		while ( condition ){
+		while ( !( controller.modifiable.isAttackable( index.x, index.y ) && controller.targetColor( index.x, index.y, color ) ) ){
 			index.x = Math.floor( ( Math.random() * controller.modifiable.moduleCount ) );
 			index.y = Math.floor( ( Math.random() * controller.modifiable.moduleCount ) );
 		
@@ -222,25 +244,7 @@
 
 		decodeQR( 'modifiable' );
 
-	};
-
-	var invertAttack = function( ){
-    
-		automatedAttack( ( !controller.modifiable.isAttackable( index.x, index.y ) || !controller.targetColor( index.x, index.y, color ) ) );
-		
-		// See the global error catcher at the top of this file
-		if( currentValue == $('#decoded').val() ) {
-			attackRunning = setTimeout(invertAttack, parseInt( $('#timing').val() ) );
-		}
-	};
-
-	var colorAttack = function( color ){
-
-		automatedAttack( !controller.modifiable.isAttackable( index.x, index.y ) );
-
-		decodeQR( 'modifiable' );
-
-		// See the global error catcher at the top of this file
+		// See the global error catcher re the top of this file
 		if( currentValue == $('#decoded').val() ) {
 			attackRunning = setTimeout(colorAttack, parseInt( $('#timing').val() ), color);
 		}
@@ -337,58 +341,6 @@
 	$("#collapseGen").collapse('show');
 	$("#collapseAttack").collapse('show');
 
-	switch( action ) {
-		case 'manual':
-			if( !controller.modifiable.attackable ) { throw 'All available targetted areas already attacked.'; }
-
-			controller.modifiable.canvas.onmousedown = function(evt) {
-	            if( action == 'manual' ){
-					var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
-					if ( controller.modifiable.isAttackable( index.x, index.y ) ){
-						recordIndex( index.x, index.y );
-						controller.invert( index.x, index.y );
-					}
-				}
-	        };
-
-			break;
-		case 'deface':
-
-			controller.modifiable.canvas.onmousemove = function(evt) {
-	            if (!controller.modifiable.canvas.isDrawing) {
-	               return;
-	            }
-	            if( action == 'deface' ){
-		            mouse = controller.modifiable.getMousePos( evt );
-		            controller.modifiable.drawMouse( mouse, $('#color').val(), $('#brushSize').val() );
-	            }
-	        };
-
-	        controller.modifiable.canvas.onmousedown = function(evt) {
-	            controller.modifiable.canvas.isDrawing = true;
-	        };
-
-	        controller.modifiable.canvas.onmouseup = function(evt) {
-	            controller.modifiable.canvas.isDrawing = false;
-	        };
-
-			break;
-		case 'invert':
-
-			invertAttack();
-
-			break;
-		case 'color':
-
-			controller.modifiable.updatePermissibleAreaByColor( $('#color').val() );
-			colorAttack( $('#color').val() );
-
-			break;
-		default:
-			throw 'Not a Simulation Option';
-			break;
-	};
-
 	// Input Triggers 
 
 	$("#attackMode").on("input change", showChangesInAttack);
@@ -396,8 +348,72 @@
 	$(".target").on("input change", function(){
 		updateOptions();
 		controller.modifiable.resetPermissibleArea(options);
-		controller.modifiable.viewPermissibleArea();
 	});
 
+
+	$("#simulate").on("click", function(){
+
+		if( isAttacking && attackRunning != null ){
+			isAttacking = false;
+			window.clearTimeout( attackRunning ); 
+			attackRunning = null;
+			return;
+		}
+
+		action = $('#attackMode').val();
+
+		switch( action ) {
+			case 'manual':
+				if( !controller.modifiable.attackable ) { throw 'All available targetted areas already attacked.'; }
+
+				controller.modifiable.canvas.onmousedown = function(evt) {
+		            if( action == 'manual' ){
+						var index = controller.modifiable.getCanvasIndex( controller.modifiable.getMousePos( evt ) );
+						if ( controller.modifiable.isAttackable( index.x, index.y ) ){
+							recordIndex( index.x, index.y );
+							controller.invert( index.x, index.y );
+						}
+					}
+		        };
+
+				break;
+			case 'deface':
+
+				controller.modifiable.canvas.onmousemove = function(evt) {
+		            if (!controller.modifiable.canvas.isDrawing) {
+		               return;
+		            }
+		            if( action == 'deface' ){
+			            mouse = controller.modifiable.getMousePos( evt );
+			            controller.modifiable.drawMouse( mouse, $('#color').val(), $('#brushSize').val() );
+		            }
+		        };
+
+		        controller.modifiable.canvas.onmousedown = function(evt) {
+		            controller.modifiable.canvas.isDrawing = true;
+		        };
+
+		        controller.modifiable.canvas.onmouseup = function(evt) {
+		            controller.modifiable.canvas.isDrawing = false;
+		        };
+
+				break;
+			case 'invert':
+
+				invertAttack();
+
+				break;
+			case 'color':
+
+				controller.modifiable.updatePermissibleAreaByColor( $('#color').val() );
+				colorAttack( $('#color').val() );
+
+				break;
+			default:
+				throw 'Not a Simulation Option';
+				break;
+		};
+
+	});
 
 }(jQuery));
