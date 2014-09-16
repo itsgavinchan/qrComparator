@@ -35,6 +35,10 @@
 
 }
 
+.container-fluid{
+  visibility: hidden;
+}
+
 canvas{
   background-color: white;
 }
